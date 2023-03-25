@@ -94,14 +94,10 @@ public abstract partial class ExcelDataReader : DbDataReader, IDisposable, IDbCo
 	/// <exception cref="ArgumentException">If the filename refers to a file of an unknown type.</exception>
 	public static ExcelDataReader Create(string filename, ExcelDataReaderOptions? options = null)
 	{
-		var type = GetWorkbookType(filename);
-		if (type == ExcelWorkbookType.Unknown)
-			throw new ArgumentException(null, nameof(filename));
-
-		var s = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read, 1);
+		var s = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1);
 		try
 		{
-			var reader = Create(s, type, options);
+			var reader = Create(s, options);
 			reader.ownsStream = true;
 			reader.stream = s;
 			return reader;
@@ -142,44 +138,12 @@ public abstract partial class ExcelDataReader : DbDataReader, IDisposable, IDbCo
 	/// Creates a new ExcelDataReader instance.
 	/// </summary>
 	/// <param name="stream">A stream containing the Excel file contents. </param>
-	/// <param name="fileType">The type of file represented by the stream.</param>
 	/// <param name="options">An optional ExcelDataReaderOptions instance.</param>
 	/// <returns>The ExcelDataReader.</returns>
-	public static ExcelDataReader Create(Stream stream, ExcelWorkbookType fileType, ExcelDataReaderOptions? options = null)
+	public static ExcelDataReader Create(Stream stream, ExcelDataReaderOptions? options = null)
 	{
 		options = options ?? ExcelDataReaderOptions.Default;
-
-		switch (fileType)
-		{
-			case ExcelWorkbookType.Excel:
-				return XlsWorkbookReader.CreateAsync(stream, options).GetAwaiter().GetResult();
-			case ExcelWorkbookType.ExcelXml:
-				return new XlsxWorkbookReader(stream, options);
-			case ExcelWorkbookType.ExcelBinary:
-				return new XlsbWorkbookReader(stream, options);
-			default:
-				throw new ArgumentException(nameof(fileType));
-		}
-	}
-
-	static readonly Dictionary<string, ExcelWorkbookType> FileTypeMap = new(StringComparer.OrdinalIgnoreCase)
-	{
-		{ ".xls", ExcelWorkbookType.Excel },
-		{ ".xlsx", ExcelWorkbookType.ExcelXml },
-		{ ".xlsm", ExcelWorkbookType.ExcelXml },
-		{ ".xlsb", ExcelWorkbookType.ExcelBinary },
-	};
-
-	/// <summary>
-	/// Gets the type of an Excel workbook from the file name.
-	/// </summary>
-	public static ExcelWorkbookType GetWorkbookType(string filename)
-	{
-		var ext = Path.GetExtension(filename);
-		return
-			FileTypeMap.TryGetValue(ext, out var type)
-			? type
-			: 0;
+		return new XlsxWorkbookReader(stream, options);
 	}
 
 	/// <summary>
@@ -250,11 +214,6 @@ public abstract partial class ExcelDataReader : DbDataReader, IDisposable, IDbCo
 				: null;
 		}
 	}
-
-	/// <summary>
-	/// Gets the type of workbook being read.
-	/// </summary>
-	public abstract ExcelWorkbookType WorkbookType { get; }
 
 	/// <summary>
 	/// Gets the number of rows in the current sheet.

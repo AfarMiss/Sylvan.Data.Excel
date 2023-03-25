@@ -45,8 +45,6 @@ sealed class XlsxWorkbookReader : ExcelDataReader
 	int parsedRowIndex = -1;
 	int curFieldCount = -1;
 
-	public override ExcelWorkbookType WorkbookType => ExcelWorkbookType.ExcelXml;
-
 	static ZipArchiveEntry? GetEntry(ZipArchive a, string name)
 	{
 		return a.Entries.FirstOrDefault(e => StringComparer.OrdinalIgnoreCase.Equals(e.FullName, name));
