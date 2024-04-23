@@ -22,4 +22,15 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="Sylvan.Data.Excel.Tests" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="ClosedXML" Version="0.102.1" />
+	  <PackageReference Include="Dapper" Version="2.0.151" />
+	  <PackageReference Include="Dapper.StrongName" Version="2.0.151" />
+	  <PackageReference Include="EPPlus" Version="6.2.9" />
+	  <PackageReference Include="LazyCache" Version="2.4.0" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+	  <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+	  <PackageReference Include="System.Runtime.Caching" Version="7.0.0" />
+	</ItemGroup>
 </Project>
